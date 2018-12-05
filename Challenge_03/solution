@@ -1,0 +1,28 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+use List::Util 'sum';
+
+use experimental 'signatures';
+
+my $input = "input";
+open my $fh, "<", $input;
+local $/;
+my $text = <$fh>;
+
+#
+# Repeatedly delete stuff
+#
+1 while $text =~ s/\b([0-9]+)\b .* \b\g{1}\b/$1/xg;
+
+#
+# Sum the remainder
+#
+say sum split ' ' => $text;
+
+__END__
