@@ -1,3 +1,6 @@
+Short walks
+===========
+
 You're in an oddly shaped room, there are squares on the floor and
 you move one square at a time. The room looks like this:
 

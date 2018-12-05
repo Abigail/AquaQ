@@ -1,3 +1,6 @@
+One is all you need
+===================
+
 You've found a table which is supposed to record only unique values
 in the order they appeared. Looking closely, you realise that some
 of the values occur multiple times. Consulting the documentation,
