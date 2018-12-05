@@ -1,0 +1,73 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+
+use experimental 'signatures';
+
+my $input = "input";
+open my $fh, "<", $input;
+chomp (my @lines = <$fh>);
+shift @lines;   # CSV header.
+
+my $START_RATING = 1200;
+
+sub expected_result ($first, $second) {
+    1 / (1 + 10 ** (($second - $first) / 400));
+}
+
+sub gain ($result, $expected_result) {
+    20 * ($result - $expected_result);
+}
+
+my %ratings;
+
+foreach my $line (@lines) {
+    my ($player1, $player2, $result) = split /,/ => $line;
+
+    #
+    # Give players a starting rating if necessary.
+    #
+    $ratings {$player1} ||= $START_RATING;
+    $ratings {$player2} ||= $START_RATING;
+
+    #
+    # Calculate the expected result for the first player.
+    #
+    my $expected_result = expected_result $ratings {$player1},
+                                          $ratings {$player2};
+
+    #
+    # Normalize the result (1, 0.5, 0) for the first player.
+    #
+    my ($score1, $score2) = split /-/ => $result;
+    $result = $score1 < $score2 ? 0
+            : $score1 > $score2 ? 1
+            :                     0.5;
+
+    #
+    # Calculate the rating gain for the first player.
+    #
+    my $gain = gain ($result, $expected_result);
+
+    #
+    # Update ratings; this rating is a zero-sum game, so what 
+    # the first player gains, the second player loses.
+    #
+    $ratings {$player1} += $gain;
+    $ratings {$player2} -= $gain;
+}
+
+#
+# Now, find the highest and lowest rating, and find the difference.
+#
+my @ratings = sort {$b <=> $a} values %ratings;
+
+say int ($ratings [0]) - int ($ratings [-1]);
+
+
+__END__
