@@ -1,22 +1,23 @@
-Setting a colour attribute on your webpage can be much more interesting
-than it appears - HTML/CSS will take any string and convert it into
-a hexadecimal representation for use in a webpage. For instance,
-text with tag:
+You've found a table which is supposed to record only unique values
+in the order they appeared. Looking closely, you realise that some
+of the values occur multiple times. Consulting the documentation,
+you see the original system was designed to only have data appended,
+so there was no way to correct broken inputs.
 
-    body bgcolor="kdb4life"
+Instead, a record appearing more than once means that everything
+between the first instance of that record up to the latest occurrence
+was incorrect, and should be discarded. Values after this occurrence
+are treated as if those records in between hadn't existed. What is
+the sum of the values returned from your input after this process
+has been applied?
+
+For example input:
+
+    1 4 3 2 4 7 2 6 3 6
+
+    f[1 4 3 2 4 7 2 6 3 6]
+    1 4 7 2 6
 
 
-produces a nice blue colour. The conversion process happens like so:
+In this case, the summed answer would be 20.
 
-  - Set the string's non-hexadecimal characters to 0.
-  - Pad the string length to the next multiple of 3.
-  - Split the result into 3 equal sections.
-  - The first two digits of each remaining section are the hex components.
-
-
-Above, "kdb4life" as an input string becomes
-
-0d40fe
-
-
-What is the six-character colour hex output of your input string?
