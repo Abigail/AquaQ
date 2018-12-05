@@ -1,0 +1,76 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+
+use experimental 'signatures';
+
+my $input = "input";
+open my $fh, "<", $input;
+local $/;
+my $commands = <$fh>;
+$commands =~ s/\s+//g;
+
+
+my $layout = << "--";
+..##..
+.####.
+######
+######
+.####.
+..##..
+--
+
+#
+# Map board into something we can easily index
+#
+my $board;
+foreach my $line (split /\n/ => $layout) {
+    push @$board => [map {/#/ ? 1 : 0} split // => $line];
+}
+
+#
+# Map commands to how we need to step.
+#
+my $directions = {
+    'U'  =>  [-1,  0],
+    'L'  =>  [ 0, -1],
+    'R'  =>  [ 0,  1],
+    'D'  =>  [ 1,  0],
+};
+
+#
+# Start position, and initialization of totals.
+#
+my $X     = 0;
+my $Y     = 2;
+my $total = 0;
+
+foreach my $command (split // => $commands) {
+    my ($dx, $dy)       = @{$$directions {$command}};
+    my ($new_x, $new_y) = ($X + $dx, $Y + $dy);
+
+    #
+    # Check whether this is a valid move: inside the board,
+    # and only if there's a '#'. If valid, move.
+    #
+    if ($new_x >= 0 && $new_x < @{$board}      &&
+        $new_y >= 0 && $new_y < @{$$board [0]} &&
+        $$board [$new_x] [$new_y]) {
+        ($X, $Y) = ($new_x, $new_y);
+    }
+
+    #
+    # Add X and Y position to total, regardless whether we moved or not.
+    #
+    $total += $X + $Y;
+}
+
+say $total;
+
+
+__END__
