@@ -1,0 +1,35 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+use List::Util 'sum';
+
+use experimental 'signatures';
+
+#
+# Calculate the gcd.
+#
+sub gcd;
+sub gcd ($first, $second) {
+    return gcd $second, $first if $first < $second;
+    return $second unless $first % $second;
+    return gcd $second, $first - $second * int ($first / $second);
+}
+
+
+my $input = "input";
+open my $fh, "<", $input;
+chomp (my $number = do {local $/; <$fh>});
+
+
+#
+# Co-primes are those numbers whose gcd equals 1.
+#
+say sum grep {gcd ($number, $_) == 1} 1 .. $number - 1;
+
+
+__END__
