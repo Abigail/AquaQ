@@ -1,0 +1,50 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+
+use experimental 'signatures';
+
+my $input = "input";
+open my $fh, "<", $input;
+my $line = <$fh>;
+
+chomp $line;
+
+#
+# Step 1, set each non-hex character to 0.
+#
+$line =~ s/[^a-f0-9]/0/gi;
+
+#
+# Step 2. Pad the string to the next multiple of 3.
+# We assume we should pad with 0's, although it doesn't
+# matter for the given input.
+#
+while (length ($line) % 3) {
+    $line .= "0";
+}
+
+#
+# Step 3. Split into three equal sections.
+#
+my $length = length $line;
+my $third  = $length / 3;
+my @parts;
+$parts [$_] = substr $line, $third * $_, $third for 0 .. 2;
+
+#
+# Step 4. Take first digits of each part
+#
+$_ = substr $_, 0, 2 for @parts;
+
+#
+# And print them
+#
+say @parts;
+
+__END__
