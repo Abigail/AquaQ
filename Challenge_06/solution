@@ -1,0 +1,31 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+
+use experimental 'signatures';
+
+my $target = 123;
+
+#
+# We could be a bit more efficient to require $i <= $j <= $k, 
+# and then multiply the each count by 6, 3, or 1 (depending how
+# many if $i, $j, $k equal each other), but no need to bother
+# for a low target as given in the exercise.
+#
+my $count = 0;
+for (my $i = 0; $i <= $target; $i ++) {
+    for (my $j = 0; $i + $j <= $target; $j ++) {
+        my $k = $target - $i - $j;
+        my $all = "$i$j$k";
+        $count += $all =~ y/1/1/;
+    }
+}
+
+say $count;
+
+__END__
