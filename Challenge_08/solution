@@ -1,0 +1,70 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+use List::Util 'sum';
+
+use experimental 'signatures';
+
+my $input = "input";
+open my $fh, "<", $input;
+chomp (my @lines = <$fh>);
+
+shift @lines;   # CSV header
+#
+# Don't buy anything the day after
+push @lines => "Last day,0,0";
+
+my @milk = (0) x 5;
+my $cereal;
+
+foreach my $line (@lines) {
+    my ($date, $new_milk, $new_cereal) = split /,/ => $line;
+
+    #
+    # Expire milk, start new day
+    #
+    shift @milk;
+    push  @milk => 0;
+
+    #
+    # How much milk do we have?
+    #
+    my $have_milk = sum @milk;
+
+    #
+    # Consume
+    #
+    if ($have_milk >= 100 && $cereal >= 100) {
+        $cereal -= 100;
+        #
+        # Subtract milk. Note that we always buy milk in
+        # multiples of 100 ml, so if we have a stash of
+        # milk, we can subtract without it becoming negative.
+        #
+        foreach my $i (keys @milk) {
+            if ($milk [$i]) {
+                $milk [$i] -= 100;
+                last;
+            }
+        }
+    }
+
+    #
+    # Add what we bought
+    #
+    $milk [-1] += $new_milk;
+    $cereal    += $new_cereal;
+
+ #  say $date, " ", sum (@milk), " ", $cereal, " [@milk]";
+}
+
+say sum @milk, $cereal;
+
+
+
+__END__
