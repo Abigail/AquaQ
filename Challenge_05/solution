@@ -1,0 +1,78 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+
+use experimental 'signatures';
+
+my $input = "input";
+open my $fh, "<", $input;
+chomp (my $commands = do {local $/; <$fh>});
+
+my @commands = split // => $commands;
+
+my $FRONT  = 0;
+my $LEFT   = 1;
+my $TOP    = 2;
+my $BACK   = 3;
+my $RIGHT  = 4;
+my $BOTTOM = 5;
+
+#
+# Initial state
+#
+my @dice;
+$dice [0] [$FRONT] = 1;
+$dice [0] [$LEFT]  = 2;
+$dice [0] [$TOP]   = 3;
+$dice [1] [$FRONT] = 1;
+$dice [1] [$LEFT]  = 3;
+$dice [1] [$TOP]   = 2;
+
+#
+# Fill in the unseen faces
+#
+foreach my $die (@dice) {
+    $$die [$_] = 7 - $$die [$_ - 3] for $BACK, $RIGHT, $BOTTOM;
+}
+
+#
+# Directions for each command.
+#
+#    - Up:    Front -> Top; Top -> Back; Back -> Bottom; Bottom -> Front.
+#    - Down:  Front -> Bottom; Top -> Front; Back -> Top; Bottom -> Back.
+#    - Left:  Front -> Left; Left -> Back; Back -> Right; Right -> Front.
+#    - Right: Front -> Right; Left -> Front; Back -> Left; Right -> Back.
+#
+# As full permutations this means that
+#    [$FRONT, $LEFT, $TOP, $BACK, $RIGHT, $BOTTOM] is mapped to:
+#
+
+my $directions = {
+    U  =>  [$TOP,    $LEFT,  $BACK,  $BOTTOM, $RIGHT, $FRONT],
+    D  =>  [$BOTTOM, $LEFT,  $FRONT, $TOP,    $RIGHT, $BACK],
+    L  =>  [$LEFT,   $BACK,  $TOP,   $RIGHT,  $FRONT, $BOTTOM],
+    R  =>  [$RIGHT,  $FRONT, $TOP,   $LEFT,   $BACK,  $BOTTOM],
+};
+
+my $count = 0;
+foreach my $index (keys @commands) {
+    #
+    # Rotate all the die according to the commands
+    #
+    foreach my $die (@dice) {
+        @$die [@{$$directions {$commands [$index]}}] = @$die;
+    }
+    #
+    # Add instruction number to running count if front faces are equal.
+    #
+    $count += $index if $dice [0] [$FRONT] == $dice [1] [$FRONT];
+}
+
+say $count;
+
+__END__
