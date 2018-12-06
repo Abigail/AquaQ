@@ -1,0 +1,21 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+use bigint;
+use List::Util 'product';
+
+use experimental 'signatures';
+
+my $input = "input";
+open my $fh, "<", $input;
+chomp (my @numbers = <$fh>);
+
+say product 1, @numbers;
+
+
+__END__
