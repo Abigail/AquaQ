@@ -1,0 +1,62 @@
+#!/opt/perl/bin/perl
+
+use 5.026;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+use autodie;
+
+use experimental 'signatures';
+
+my $REALLY_BIG = 9_999_999_999_999;
+
+my $input = "input";
+open my $fh, "<", $input;
+
+<$fh>;  # Useless first line.
+
+my $matrix;
+
+while (<$fh>) {
+    chomp;
+    my ($first, $second, $cost) = split /,/;
+    $$matrix {$first} {$second} = $cost;
+}
+
+my $cost = {};
+foreach my $node (keys %$matrix) {
+    $$cost {$node} = $REALLY_BIG;
+}
+
+#
+# First node
+#
+my $start = "TUPAC";
+my $goal  = "DIDDY";
+
+$$cost {$start} = 0;
+my %todo = ($start => 1);
+
+#
+# Calculate the minimum cost to reach each node, using 
+# a Dijkstra based method.
+#
+while (%todo) {
+    my ($todo) = sort {$$cost {$a} <=> $$cost {$b}} keys %todo;
+    delete $todo {$todo};
+    #
+    # All neighbours of $todo
+    #
+    foreach my $neighbour (keys %{$$matrix {$todo}}) {
+        my $edge_cost = $$matrix {$todo} {$neighbour};
+        if ($$cost {$todo} + $edge_cost < $$cost {$neighbour}) {
+            $$cost {$neighbour} = $$cost {$todo} + $edge_cost;
+            $todo {$neighbour} = 1;
+        }
+    }
+}
+
+say $$cost {$goal};
+
+__END__
